@@ -27,8 +27,9 @@ class Monster:
 
 	def move(self,turn):
 		if (self.pattern[turn%3] == 'a'):
-			print(self.message[self.name][0])
 			damage = random.randint(int(40*0.8),int(40*1.2))
+			print(self.message[self.name][0])
+			print("It deals {} damage!".format(damage))
 			return damage
 		else:
 			print(self.message[self.name][1])
@@ -55,6 +56,7 @@ class Item:
 class Player:
 	def __init__(self,name,game):
 		self.name = name 
+		self.game = game
 		self.hp = 100
 		self.attack = 10
 		self.speed = 10
@@ -63,7 +65,7 @@ class Player:
 		self.location = (1,2)
 		self.battle = 0
 		self.collected = [0,0]
-		self.game = game
+		self.cooldown = 0
 
 	def show_inv(self):
 		print("\nInventory: ")
@@ -75,7 +77,7 @@ class Player:
 		print("HP: {}/{}".format(self.hp,100))
 		print("Attack: {}".format(self.attack))
 		print("Speed: {}".format(self.speed))
-		print("Actions:\n1. Attack 2. Block 3. Run")
+		print("Actions:\n1. Use item 2. Block 3. Run")
 
 	def add_item(self,name):
 		'''
@@ -102,6 +104,11 @@ class Player:
 
 	def block(self):
 		print("You raise your shield to block it\'s attack!")
+		self.cooldown = 1
+
+	def use_item(self):
+		pass
+		
 
 class Game:
 	def __init__(self):
@@ -172,25 +179,60 @@ class Game:
 		if (self.player.speed > monster.speed):
 			first = 1
 		while (self.player.battle):
+			print(self.player.cooldown)
+			if (self.player.cooldown == 1):
+				self.player.cooldown = 2
 			turn += 1
 			print()
 			self.player.battle_ui()
 			while (1):
 				action = input('>')
 				if (action in valid):
-					break
+					if (action=='2'):
+						if (self.player.cooldown): print("You're too exhausted to block another attack!")
+						else: break
+					else: break
 				else:
 					print("Invalid move!")
-			if (action=='2'):
+			p_damage = 0  # default is 0
+			p_buff = [0,0] # 0 - health, 1 - attack
+			if (action=='1'):
+				if (not len(self.player.inventory)):
+					print("You have no usable items!")
+					continue
+				else:
+					while (1):
+						self.player.show_inv()
+						option = input('>')
+						if (Item.items[option][2]=='w'):
+							base_damage = Item.items[option][0] * self.player.attack
+							p_damage = random.randint(int(base_damage*0.8),int(base_damage*1.2))
+						else:
+							p_buff[0] = Item.items[option][0]
+							p_buff[1] = Item.items[option][1]
+						break
+			if (action=='2' and not self.player.cooldown):
 				self.player.block()
 				continue
-			if (first):
-				pass
+			if (not first):
+				m_damage = monster.move(turn)
+				if (dmg != -1):
+					self.player.hp -= m_damage
+				else:
+					if (action=='1'):
+						print("Your attack has no effect!")
 			else:
-				if (dmg==-1):
+				m_damage = monster.move(turn)
+				if (dmg == -1 and p_damage != 0):
+					print("Your attack has no effect!")
+				else:
+					if (p_damage > 0):
+						print("Your attack deals {} damage.".format(p_damage))
+						monster.hp -= p_damage
 					
-				if (action=='1'):
-					pass
+			if (self.player.cooldown == 2):
+				self.player.cooldown = 0
+
 
 	def loop(self):
 		self.intro()
