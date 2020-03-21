@@ -1,0 +1,7 @@
+This is a text based adventure game.
+It is set in a labyrinth, where the player must find their way out.
+The player would encounter obstacles, such as monsters and traps.
+After escaping the maze, there would be a boss fight which the player must win in order to beat the game.
+
+
+
