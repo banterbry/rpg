@@ -1,2 +1,4 @@
-# rpg
-A simple text-based adventure role playing game, made with python
+# The Labyrinth
+A simple text-based adventure Role Playing Game (rpg).
+Made with Python
+
