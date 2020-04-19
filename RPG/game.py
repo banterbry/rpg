@@ -11,27 +11,31 @@ def flush():
 	print()
 	print('-'*10)
 
+# def typewrite(s):
 
 class Game:
 	def __init__(self):
 		self.player = Player(input("What is your name?"),self)
 		self.run = 1
+		self.damage_to = 0
+		self.damage_from = 0
 		self.battle_pos = {
-		(1,3) : "Arachnid",
-		(2,3) : "Basilisk" 
+		(2,1) : "Arachnid",
+		(2,2) : "Basilisk",
+		(4,3) : "Minotaur"
 		}
 		self.game_map = { # stores all the map descriptions 
 		(0,0) : "The gates to the Labyrinth looms infront of you. Torches illuminate it on either side.",
 		(0,1) : "A dim glow emits from the passage ahead. The passage to the east and west are dark.",
-		(0,2) : ["A towering figure appears in front of you.","The room appears to be empty."],
-		(-1,1): "There appears to be a wooden chest lying on the ground.",
-		(1,1) : "You have entered a spacious cave system. There is a dim light in the passage to the East.\nDarkness fills the North.",
-		(2,1) : "Welcome to the shop! Enter the id of the item you would like to purchase, or -1 to exit.",
-		(1,2) : "The roof begins to cave in... Something doesn\'t feel right.",
-		(1,3) : ["You come face to face with an Arachnid.","The grotesque remains of the demon lies still. Passage ways opens to the North and East."],
-		(1,4) : "trap",
-		(2,3) : ["You come face to face with a Basilisk.","The grotesque remains of the serpent lies still."],
-		(3,3) :	"boss"
+		(0,2) : ["A towering figure appears in front of you. [x]","The room appears to be empty."],
+		(-1,1): ["There appears to be a wooden chest lying on the ground. [x]","The chest is empty."],
+		(1,1) : "You have entered a narrow passage way. The path to the east looks menacing...",
+		(2,3) : "The roof begins to cave in... Something doesn\'t feel right. There are paths to the north and east.",
+		(2,1) : ["You come face to face with an Arachnid.","The grotesque remains of the demon lies still. A passage way suddenly appears to the North."],
+		(2,4) : "You fall into a pit of lava. You die. [ENTER] to continue.",
+		(2,2) : ["You come face to face with a Basilisk.","The grotesque remains of the serpent lies still. The passage to the north extennds."],
+		(3,3) :	"Something is wrong. You feel as if you are constantly being watched... it isn't too late to turn back.",
+		(4,3) : ["Menacing...\nYou come face to face with a Minotaur","The reamins of that wretched creature is scattered around."]
 		}
 
 	def intro(self):
@@ -40,6 +44,12 @@ class Game:
 		print("Find your way through the maze, and defeat the mighty Minotaur.")
 		# time.sleep(2.5)
 		print("Good luck...\n")
+
+	def end_screen(self):
+		print("Good work, {}. You have successfully defeated the Minotaur.\n".format(self.player.name))
+		print("Damage dealt: {}".format(self.damage_to))
+		print("Damage taken: {}".format(self.damage_from))
+		print("Deaths: {}".format(self.player.deaths))
 
 	def help(self):
 		print("Actions: ")
@@ -51,7 +61,10 @@ class Game:
 		if (self.player.location == (0,2)): 
 			print(self.game_map[self.player.location][self.player.collected[0]])
 			return
-		if (self.player.location in self.battle_pos):
+		elif (self.player.location == (-1,1)):
+			print(self.game_map[self.player.location][self.player.collected[1]])
+			return
+		elif (self.player.location in self.battle_pos):
 			already = self.player.battle_history[self.player.location]
 			print(self.game_map[self.player.location][already])
 			if (not already): 
@@ -65,20 +78,18 @@ class Game:
 			if (not self.player.collected[0]):
 				print("A booming voice reverberates around the room.")
 				print("\"It\'s dangerous to go alone! Take this.\"")
-				item = Item("Sword",1)
+				item = Item("sword",1)
 				self.player.collected[0] = 1
 				self.player.add_item(item.id)	
 		elif (self.player.location == (-1,1)):
 			if (not self.player.collected[1]):
-				item = Item("Potion of Health",1)
+				item1 = Item("health potion",1)
+				item2 = Item("strength potion",1)
 				self.player.collected[1] = 1
-				self.player.add_item(item.id)
+				self.player.add_item(item1.id)
+				self.player.add_item(item2.id)
 		else:
 			print("There\'s nothing to interact with!")
-
-	def shop(self):
-		if (self.player.location == (2,1)):
-			pass
 
 	def battle_engine(self,name):
 		'''
@@ -112,29 +123,34 @@ class Game:
 					elif (option=='3'):
 						print("You live to fight another day...")
 						self.player.battle = 0
+						self.player.location = self.player.prev # sets player location to where it came from
 						break
-			if (not self.player.battle): break # if the player abandons the battle
+			if (not self.player.battle): 
+				self.show_description()
+				break # if the player abandons the battle
 			player_damage = 0
 			monster_damage = 0
 			monster_move = monster.pattern[turn%3]
 			if (monster_move=='b' and option=='2'): # in the event that both player and monster try blocking
-				print("The {} tries to block your block...".format(name))
+				print("You both attempt blocking... cowards.")
 				self.player.cooldown = 1
 				continue
 			if (self.player.cooldown==1): # cooldown timer for player blocking
 				self.player.cooldown = 2
 			elif (self.player.cooldown==2):
 				self.player.cooldown = 0
-			if (first):
+			if (first): # if the player goes first
 				'''---player actions---''' 
 				if (option=='1'): 
-					player_damage = self.player.use_item()
+					player_damage = self.player.get_damage()
 				if (monster_move == 'b'): 
 					monster.show_message(1)
 					player_damage //= 3
 				if (option=='1'):
+					self.player.show_message()
 					print("Your attack deals {} damage!".format(int(player_damage)))
 					monster.hp -= player_damage
+				self.damage_to += player_damage
 				if (monster.hp <= 0):
 					victor = 'p'
 					self.player.battle = 0
@@ -148,6 +164,7 @@ class Game:
 				monster.show_message(0)
 				print("The {}\'s attack deals {} damage!".format(name,monster_damage))	
 				self.player.hp -= monster_damage
+				self.damage_from += monster_damage
 				if (self.player.hp <= 0):
 					victor = 'm'
 					self.player.battle = 0
@@ -161,39 +178,49 @@ class Game:
 					monster_damage //= 3
 				'''---player actions---'''
 				if (option=='1'):
-					player_damage = self.player.use_item()
+					player_damage = self.player.get_damage()
 				if (monster_move =='b'):
 					player_damage //= 3
 				monster.show_message(0) if (monster_move=='a') else monster.show_message(1)
-				print("The {}\'s attack deals {} damage!".format(name,monster_damage))	
+				if (monster_move=='a'): print("The {}\'s attack deals {} damage!".format(name,monster_damage))	
 				self.player.hp -= monster_damage
+				self.damage_from += monster_damage
 				if (self.player.hp <= 0):
 					victor = 'm'
 					self.player.battle = 0
 					break	
 				if (option == '1'):
+					self.player.show_message()
 					print("Your attack deals {} damage!".format(int(player_damage)))
 					monster.hp -= player_damage
+				self.damage_to += player_damage	
 				if (monster.hp <= 0):
 					victor = 'p'
 					self.player.battle = 0  
 
 		if (victor == 'p'):
-			print("You have slained the {}. [ENTER] to continue".format(name))
+			print("You have slained the {}. [ENTER] to continue\n".format(name))
+			drops = monster.drop()
+			for i in drops:
+				self.player.add_item(i)
 			self.player.battle_history[self.player.location] = 1
 		elif (victor == 'm'):
 			print("You have been slained by the {}... [ENTER] to continue".format(name))
-			self.player.hp = 100
-			self.player.location = (0,0)
+			self.player.die()
 
 	def loop(self):
 		self.intro()
 		self.help()
 		while (self.run):
 			flush()
+			if (self.player.battle_history[(4,3)]==1):
+				self.end_screen()
+				break
 			self.show_description()
 			if (self.player.battle):
 				self.battle_engine(self.battle_pos[self.player.location])
+			if (self.player.location==(2,4)):
+				self.player.die()
 			action = input('>')
 			if (action.lower() == 'n'):
 				self.player.update_pos(0,1)
@@ -209,10 +236,10 @@ class Game:
 				self.player.show_inv()
 			elif (action.lower() == 'h'):
 				self.help()
+			elif (action == "use"):
+				self.player.use_potion()
 
 if "__main__" == __name__:
 	game = Game()
 	game.loop()
-
-
 
