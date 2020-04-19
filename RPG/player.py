@@ -7,28 +7,34 @@ class Player:
 		self.name = name 
 		self.game = game
 		self.hp = 100
+		self.max_hp = 100
 		self.attack = 20
-		self.speed = 10
-		self.coins = 50
-		self.inventory =  {"Sword" : 1}
-		self.location = (2,3)
+		self.speed = 10	
+		self.inventory =  {}
+		self.location = (0,0)
+		self.prev = (0,0)
 		self.battle = 0	
 		self.collected = [0,0]
+		self.deaths = 0
 		self.battle_history = {	# to check if a the player has already completed a particular fight
-		(1,3) : 0,
-		(2,3) : 0
+		(2,1) : 0,
+		(2,2) : 0,
+		(4,3) : 0
 		}
 		self.cooldown = 0	# block cooldown
-		self.weapon = 1
+		self.weapon = 0
 
 	def show_inv(self):
+		print("\nName: {}".format(self.name))
+		print("HP: {}".format(self.hp))
+		print("Attack: {}".format(self.attack))
 		print("\nInventory: ")
 		for i in self.inventory:
 			print("{}x {}".format(self.inventory[i],i))
 
 	def battle_ui(self):
 		print(self.name)
-		print("HP: {}/{}".format(self.hp,100))
+		print("HP: {}".format(self.hp))
 		print("Attack: {}".format(self.attack))
 		print("Speed: {}".format(self.speed))
 		print("Actions:\n1. Attack 2. Block 3. Run")
@@ -56,23 +62,61 @@ class Player:
 		self.location = tuple(lst)
 		if (self.location not in self.game.game_map): # in the event that there is no room at that coordiante
 			self.location = orig
-
+		else:
+			self.prev = orig
+			
 	def block(self):
 		print("You raise your shield to block it\'s attack!")
 		self.cooldown = 1
 
-	def use_item(self):
+	# def use_item(self):
+	# 	self.show_inv()
+	# 	while (1):
+	# 		print("Enter the name of the item: ")
+	# 		option = input('>')
+	# 		if (option not in self.inventory): print("Invalid option!")
+	# 		elif (Item.items[option][2]=='p'): print("That is not a weapon")
+	# 		else: break
+	# 	print()
+	# 	if (Item.items[option][2]=='w'):
+	# 		print("You attack with your {}.".format(option))
+	# 		base_damage = self.attack * Item.items[option][0]
+	# 		return random.randint(int(base_damage*0.8),int(base_damage*1.2))
+
+	def get_damage(self):
+		base_damage = self.attack * Item.items["sword"][0]
+		return random.randint(int(base_damage*0.8),int(base_damage*1.2))
+
+	def show_message(self): # show attack message
+		print("You attack with your sword.")
+
+	def use_potion(self):
 		self.show_inv()
 		while (1):
-			print("Enter the name of the item: ")
+			print("Enter the name of the item: (-1) to quit")
 			option = input('>')
-			if (option not in self.inventory): print("Invalid option!")
+			if (option not in self.inventory): print("Invalud option!")
 			else: break
 		print()
-		if (Item.items[option][2]=='w'):
-			print("You attack with your {}.".format(option))
-			base_damage = self.attack * Item.items[option][0]
-			return random.randint(int(base_damage*0.8),int(base_damage*1.2))
+		if (Item.items[option][2]=='p'):
+			print("You use your {}".format(option))
+			if (option=="health potion"):
+				self.hp += 100
+				print("You gained 100 hp.")
+			else:
+				self.attack += 10
+				print("You gained 10 attack.")
+			self.max_hp = max(self.max_hp,self.hp)
+			self.inventory[option]-=1
+			if (self.inventory[option]<=0):
+				del self.inventory[option]
 		else:
-			print("You use a {}.".format(option))
+			print("What do you plan to do with your sword now...")
+
+	def die(self):
+		self.deaths += 1
+		self.hp = self.max_hp
+		self.location = (0,0)
+
+
 
