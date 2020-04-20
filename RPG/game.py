@@ -33,7 +33,7 @@ class Game:
 		}
 		self.game_map = { # stores all the map descriptions in a dictionary, with coordinates as the key
 		(0,0) : "The gates to the Labyrinth looms infront of you. Torches illuminate it on either side.",
-		(0,1) : "A dim glow emits from the passage ahead. The passage to the east and west are dark.",
+		(0,1) : "A dim glow emits from the north bound passage. The passage to the east and west are dark.",
 		(0,2) : ["A towering figure appears in front of you. [x]","The room appears to be empty."],
 		(-1,1): ["There appears to be a wooden chest lying on the ground. [x]","The chest is empty."],
 		(1,1) : "You have entered a narrow passage way. The path to the east looks menacing...",
@@ -63,7 +63,7 @@ class Game:
 	def help(self):
 		print("Actions: ")
 		print("n - move North\ne - move East\nw - move West\ns - move South")
-		print("x - interact\nh - help\ni - inventory\npick - Pick up item\nuse <item name> - Use an item (only consumables)")
+		print("x - interact\nh - help\ni - inventory\npick - Pick up item\nuse - Use an item (only consumables)")
 
 	def show_description(self):
 		if (self.player.location == (0,2)): 
@@ -114,7 +114,7 @@ class Game:
 		victor = ''
 		turn = -1
 		monster = Monster(name)
-		[first = 1 if self.player.speed > monster.speed else 0]
+		first = 1 if self.player.speed > monster.speed else 0
 		while (self.player.battle):
 			turn += 1
 			flush()
@@ -192,8 +192,7 @@ class Game:
 				if (option=='1'):
 					player_damage = self.player.get_damage()
 				if (monster_move =='b'):
-					player_damage //= 3
-				monster.show_message(0) 
+					player_damage //= 3 
 				if (monster_move=='a'):
 					monster.show_message(0)
 					print("The {}\'s attack deals {} damage!".format(name,monster_damage))	
