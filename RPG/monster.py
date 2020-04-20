@@ -3,13 +3,14 @@ import time
 
 class Monster:
 	'''
-	Container for all monsters. Every monster has a special attack pattern.
-	E.g. (attack,attack,block)
+	Container for all monsters. Every monster has a special attack pattern, represented by 'A' or 'B'.
+	'A' - attack
+	'B' - block
 	'''
 	monsters = { # hp, attack, speed
-	"Arachnid" : [200,40,5],
-	"Basilisk" : [200,50,15],
-	"Minotaur" : [500,60,20]
+	"Arachnid" : [200,60,5],
+	"Basilisk" : [200,70,15],
+	"Minotaur" : [300,90,20]
 	}
 	patterns = {
 	"Arachnid" : "bab",
@@ -40,8 +41,8 @@ class Monster:
 
 	def show_message(self,idx):
 		'''
-		0 - Attack
-		1 - Block
+		idx = 0 - Attack
+		idx = 1 - Block
 		'''
 		print(self.message[self.name][idx])
 
