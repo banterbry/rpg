@@ -1,5 +1,5 @@
 This is a text based adventure game.
-It is set in a Labyrtinh, where the player must escape by defeating the Minotaur located somewhere
+It is set in a Labyrinth, where the player must escape by defeating the Minotaur located somewhere
 in the maze. Along the way, the player will have to defeat other monsters in order to get to the
 Minotaur.
 
