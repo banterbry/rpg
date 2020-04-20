@@ -18,8 +18,8 @@ class Player:
 		self.deaths = 0
 		self.battle_history = {	# to check if a the player has already completed a particular fight
 		(2,1) : 0,
-		(2,2) : 0,
-		(4,3) : 0
+		(2,3) : 0,
+		(4,4) : 0
 		}
 		self.cooldown = 0	# block cooldown
 		self.weapon = 0
@@ -52,7 +52,8 @@ class Player:
 	def update_pos(self,x,y):
 		'''
 		A function to update the coordinates of the player.
-		The x,y coordinates are stored in a tuple. Since a tuple is immutable, 
+		The x,y coordinates are stored in a tuple. 
+		Since a tuple is immutable, 
 		it is converted into a list before being updated and converted back into a tuple.
 		'''
 		orig = self.location # original location
@@ -83,7 +84,7 @@ class Player:
 	# 		base_damage = self.attack * Item.items[option][0]
 	# 		return random.randint(int(base_damage*0.8),int(base_damage*1.2))
 
-	def get_damage(self):
+	def get_damage(self): # returns the damage the player delas
 		base_damage = self.attack * Item.items["sword"][0]
 		return random.randint(int(base_damage*0.8),int(base_damage*1.2))
 
@@ -104,8 +105,8 @@ class Player:
 				self.hp += 100
 				print("You gained 100 hp.")
 			else:
-				self.attack += 10
-				print("You gained 10 attack.")
+				self.attack += 5
+				print("You gained 5 attack.")
 			self.max_hp = max(self.max_hp,self.hp)
 			self.inventory[option]-=1
 			if (self.inventory[option]<=0):
@@ -113,10 +114,8 @@ class Player:
 		else:
 			print("What do you plan to do with your sword now...")
 
-	def die(self):
+	def die(self): # reset stats upon death
 		self.deaths += 1
 		self.hp = self.max_hp
 		self.location = (0,0)
-
-
-
+		
