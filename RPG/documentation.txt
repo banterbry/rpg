@@ -1,7 +1,21 @@
 This is a text based adventure game.
-It is set in a labyrinth, where the player must find their way out.
-The player would encounter obstacles, such as monsters and traps.
-After escaping the maze, there would be a boss fight which the player must win in order to beat the game.
+It is set in a Labyrtinh, where the player must escape by defeating the Minotaur located somewhere
+in the maze. Along the way, the player will have to defeat other monsters in order to get to the
+Minotaur.
 
+One major challenge I faced was during the implementation of the battle engine. I wanted to make a 
+battle engine where it could be used in any fight with any entity. However, I did not plan our the 
+logic flow of the engine, which resulted in many bugs and a lof of troubleshooting, causing my code
+to be inefficient and cluttered. 
 
+I managed to overcome this obstacle by rewriting chunks of the engine and also simplifying the combat
+system. 
 
+1. It is crucial to plan out what I'm going to code, especially for complicated projects. Lest result in 
+bugs and troubleshooting. 
+
+2. Having a "template" for different features can save a lot of time and energy. E.g. a combat engine instead
+of manually coding the fights for every monster
+
+3. Keeping my code organised and well commented allows me to code quicker and more efficiently, as I do not need to waste time searching for a specific function or wondering what a chunk of code does, especially after
+not touching the project for a long time.
