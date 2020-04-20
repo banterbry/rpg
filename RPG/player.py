@@ -70,20 +70,6 @@ class Player:
 		print("You raise your shield to block it\'s attack!")
 		self.cooldown = 1
 
-	# def use_item(self):
-	# 	self.show_inv()
-	# 	while (1):
-	# 		print("Enter the name of the item: ")
-	# 		option = input('>')
-	# 		if (option not in self.inventory): print("Invalid option!")
-	# 		elif (Item.items[option][2]=='p'): print("That is not a weapon")
-	# 		else: break
-	# 	print()
-	# 	if (Item.items[option][2]=='w'):
-	# 		print("You attack with your {}.".format(option))
-	# 		base_damage = self.attack * Item.items[option][0]
-	# 		return random.randint(int(base_damage*0.8),int(base_damage*1.2))
-
 	def get_damage(self): # returns the damage the player delas
 		base_damage = self.attack * Item.items["sword"][0]
 		return random.randint(int(base_damage*0.8),int(base_damage*1.2))
@@ -94,9 +80,10 @@ class Player:
 	def use_potion(self):
 		self.show_inv()
 		while (1):
-			print("Enter the name of the item: (-1) to quit")
+			print("Enter the name of the item: (q) to quit")
 			option = input('>')
-			if (option not in self.inventory): print("Invalud option!")
+			if (option.lower()=='q'): return
+			if (option not in self.inventory): print("Invalid option!")
 			else: break
 		print()
 		if (Item.items[option][2]=='p'):
@@ -118,4 +105,3 @@ class Player:
 		self.deaths += 1
 		self.hp = self.max_hp
 		self.location = (0,0)
-		
