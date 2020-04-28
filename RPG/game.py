@@ -13,9 +13,10 @@ def flush():
 	print('-'*10)
 
 def typewrite(s):
+	# typewriting effect
 	for i in s:
 		print(i,end='')
-		sys.stdout.flush() # flush the output stream
+		sys.stdout.flush() 
 		time.sleep(0.03)
 	print()
 
@@ -26,7 +27,7 @@ class Game:
 		self.damage_to = 0
 		self.damage_from = 0
 		self.traps = [(2,5)]
-		self.battle_pos = {
+		self.battle_pos = { # locations of monsters
 		(2,1) : "Arachnid",
 		(2,3) : "Basilisk",
 		(4,4) : "Minotaur"
@@ -39,7 +40,7 @@ class Game:
 		(1,1) : "You have entered a narrow passage way. The path to the east looks menacing...",
 		(2,4) : "The roof begins to cave in... Something doesn\'t feel right. There are paths to the north and east.",
 		(2,1) : ["You come face to face with an Arachnid.","The grotesque remains of the demon lies still. A passage way suddenly appears to the North."],
-		(2,5) : "You fall into a pit of lava. You die. [ENTER] to continue.",
+		(2,5) : "You fall into a pit of lava. You die.",
 		(2,3) : ["You come face to face with a Basilisk.","The grotesque remains of the serpent lies still. The passage to the north extennds."],
 		(3,4) :	"Something is wrong. You feel as if you are constantly being watched... it isn't too late to turn back. Continue on your journey East or- Oh, a passage to the north!",
 		(4,4) : ["Menacing...\nYou come face to face with a Minotaur","The reamins of that wretched creature is scattered around."],
@@ -54,11 +55,15 @@ class Game:
 		time.sleep(1)
 		typewrite("Good luck...\n")
 
-	def end_screen(self):
-		print("Good work, {}. You have successfully defeated the Minotaur.\n".format(self.player.name))
+	def end_screen(self,win):
+		print()
+		if (win):
+			print("Good work, {}. You have successfully defeated the Minotaur.\n".format(self.player.name))
+		else:
+			print("Game over, {}...".format(self.player.name))
 		print("Damage dealt: {}".format(self.damage_to))
 		print("Damage taken: {}".format(self.damage_from))
-		print("Deaths: {}".format(self.player.deaths))
+		self.run = 0
 
 	def help(self):
 		print("Actions: ")
@@ -66,6 +71,10 @@ class Game:
 		print("x - interact\nh - help\ni - inventory\npick - Pick up item\nuse - Use an item (only consumables)")
 
 	def show_description(self):
+		'''
+		(0,2) and (-1,1) are special rooms, with slightly different
+		behaviour
+		'''
 		if (self.player.location == (0,2)): 
 			print(self.game_map[self.player.location][self.player.collected[0]])
 			return
@@ -73,12 +82,14 @@ class Game:
 			print(self.game_map[self.player.location][self.player.collected[1]])
 			return
 		elif (self.player.location in self.battle_pos):
-			already = self.player.battle_history[self.player.location]
-			print(self.game_map[self.player.location][already])
+			already = self.player.battle_history[self.player.location] # if the player has already fought that mosnter
+			print(self.game_map[self.player.location][already]) # display the appropriate description
 			if (not already): 
 				self.player.battle = 1
 		else:
 			print(self.game_map[self.player.location])
+		if (self.player.location in self.traps):
+			self.player.die = 1
 	
 	def interact(self):
 		print()
@@ -106,15 +117,14 @@ class Game:
 		Player damage = random(attack*weapon*0.8, attack*weapon*1.2)
 		Options for player in battle:
 		1. Attack 2. Block 3. Run
-
-		Really inefficient and poorly written code... I should've planned the 
-		logic flow of the engine instead of blindly implementing it
 		'''
-		valid = ['1','2','3']
+		valid = ['1','2','3'] # valid options for the player -> reduces hard coding
 		victor = ''
 		turn = -1
 		monster = Monster(name)
-		first = 1 if self.player.speed > monster.speed else 0
+		first = 0
+		if (self.player.speed > monster.speed): # who moves first
+			first = 1
 		while (self.player.battle):
 			turn += 1
 			flush()
@@ -126,15 +136,15 @@ class Game:
 				if (option not in valid): print("Invalid option!")
 				else:
 					if (option=='1'):
-						if (not self.player.weapon): print("You have no weapons!")
+						if (not self.player.weapon): print("You have no weapons!") # if player has no weapons to attack
 						else: break
-					elif (option=='2'):
+					elif (option=='2'): # attempts a block
 						if (self.player.cooldown): print("You are too exhausted to attempt another block!")
 						else: break
-					elif (option=='3'):
+					elif (option=='3'): # run from battles
 						print("You live to fight another day...")
 						self.player.battle = 0
-						self.player.location = self.player.prev # sets player location to where it came from
+						self.player.location = self.player.prev # sets player location to where it came from before the battle
 						flush()
 						break
 			if (not self.player.battle): 
@@ -147,8 +157,8 @@ class Game:
 				print("You both attempt blocking... cowards.")
 				self.player.cooldown = 1
 				continue
-			if (self.player.cooldown==1): # cooldown timer for player blocking
-				self.player.cooldown = 2
+			if (self.player.cooldown==1): # increments cooldown
+				self.player.cooldown += 1
 			elif (self.player.cooldown==2):
 				self.player.cooldown = 0
 			if (first): # if the player goes first
@@ -156,7 +166,7 @@ class Game:
 				if (option=='1'): 
 					player_damage = self.player.get_damage()
 				if (monster_move == 'b'): 
-					monster.show_message(1)
+					monster.show_message(1) # block has higher priority, thus it is shown first
 					player_damage //= 3
 				if (option=='1'):
 					self.player.show_message()
@@ -216,27 +226,28 @@ class Game:
 		if (victor == 'p'):
 			print("You have slained the {}. [ENTER] to continue\n".format(name))
 			self.player.battle_history[self.player.location] = 1
-			if (name=="Minotaur"): return
+			if (name=="Minotaur"): return # Minotaur has no drops, prevents key error
 			drops = monster.drop()
 			for i in drops:
 				self.player.add_item(i)
 		elif (victor == 'm'):
-			print("You have been slained by the {}... [ENTER] to continue".format(name))
-			self.player.die()
+			print("You have been slained by the {}...".format(name))
+			self.player.die = 1
 
-	def loop(self):
+	def loop(self): # Main game loop
 		self.intro()
 		self.help()
 		while (self.run):
 			flush()
-			if (self.player.battle_history[(4,4)]==1):
-				self.end_screen()
+			if (self.player.battle_history[(4,4)]==1): # if player completed the final fight
+				self.end_screen(1)
 				break
 			self.show_description()
-			if (self.player.battle):
+			if (self.player.battle): # if the player has entered battle
 				self.battle_engine(self.battle_pos[self.player.location])
-			if (self.player.location in self.traps):
-				self.player.die()
+			if (self.player.die):
+				self.end_screen(0)
+				break
 			action = input('>')
 			if (action.lower() == 'n'):
 				self.player.update_pos(0,1)
