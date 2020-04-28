@@ -7,7 +7,6 @@ class Player:
 		self.name = name 
 		self.game = game
 		self.hp = 100
-		self.max_hp = 100
 		self.attack = 20
 		self.speed = 10	
 		self.inventory =  {}
@@ -15,7 +14,7 @@ class Player:
 		self.prev = (0,0)
 		self.battle = 0	
 		self.collected = [0,0]
-		self.deaths = 0
+		self.die = 0
 		self.battle_history = {	# to check if a the player has already completed a particular fight
 		(2,1) : 0,
 		(2,3) : 0,
@@ -61,7 +60,7 @@ class Player:
 		lst[0] += x
 		lst[1] += y
 		self.location = tuple(lst)
-		if (self.location not in self.game.game_map): # in the event that there is no room at that coordiante
+		if (self.location not in self.game.game_map): # in the event that there is no room at that coordinate
 			self.location = orig
 		else:
 			self.prev = orig
@@ -94,14 +93,9 @@ class Player:
 			else:
 				self.attack += 5
 				print("You gained 5 attack.")
-			self.max_hp = max(self.max_hp,self.hp)
 			self.inventory[option]-=1
 			if (self.inventory[option]<=0):
 				del self.inventory[option]
 		else:
 			print("What do you plan to do with your sword now...")
-
-	def die(self): # reset stats upon death
-		self.deaths += 1
-		self.hp = self.max_hp
-		self.location = (0,0)
+		
