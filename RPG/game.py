@@ -5,6 +5,8 @@ from items import Item
 from player import Player
 from monster import Monster
 
+running = True
+
 def flush():
 	'''
 	A utility function to make the game interface less cluttered
@@ -26,8 +28,8 @@ class Game:
 		self.run = 1
 		self.damage_to = 0
 		self.damage_from = 0
-		self.traps = [(2,5)]
-		self.battle_pos = { # locations of monsters
+		self.traps = [(2,5)] # location of traps
+		self.battle_pos = { # location of monsters
 		(2,1) : "Arachnid",
 		(2,3) : "Basilisk",
 		(4,4) : "Minotaur"
@@ -56,6 +58,7 @@ class Game:
 		typewrite("Good luck...\n")
 
 	def end_screen(self,win):
+		global running
 		print()
 		if (win):
 			print("Good work, {}. You have successfully defeated the Minotaur.\n".format(self.player.name))
@@ -63,12 +66,25 @@ class Game:
 			print("Game over, {}...".format(self.player.name))
 		print("Damage dealt: {}".format(self.damage_to))
 		print("Damage taken: {}".format(self.damage_from))
+		print("\nPlay again? (y/n)")
+		while (1):
+			choice = input('>')
+			if (choice.lower()=='n'):
+				running = False
+				break
+			elif (choice.lower()=='y'):
+				break
+			else:
+				print("Invalid option!")
 		self.run = 0
 
-	def help(self):
+	def help(self): # list of all commands, and a brief guide to battling
 		print("Actions: ")
 		print("n - move North\ne - move East\nw - move West\ns - move South")
 		print("x - interact\nh - help\ni - inventory\npick - Pick up item\nuse - Use an item (only consumables)")
+		print("\nCombat: ")
+		print("1 - Attack\n2 - Block (reduce damage taken by 1/3)\n3 - Run")
+		print("Every monster has a special attack pattern, such as 2 attacks followed by a block.")
 
 	def show_description(self):
 		'''
@@ -234,39 +250,45 @@ class Game:
 			print("You have been slained by the {}...".format(name))
 			self.player.die = 1
 
-	def loop(self): # Main game loop
+	def loop(self): # game loop
 		self.intro()
 		self.help()
 		while (self.run):
-			flush()
-			if (self.player.battle_history[(4,4)]==1): # if player completed the final fight
-				self.end_screen(1)
-				break
-			self.show_description()
-			if (self.player.battle): # if the player has entered battle
-				self.battle_engine(self.battle_pos[self.player.location])
-			if (self.player.die):
-				self.end_screen(0)
-				break
-			action = input('>')
-			if (action.lower() == 'n'):
-				self.player.update_pos(0,1)
-			elif (action.lower() == 's'):
-				self.player.update_pos(0,-1);
-			elif (action.lower() == 'e'):
-				self.player.update_pos(1,0);
-			elif (action.lower() == 'w'):
-				self.player.update_pos(-1,0)
-			elif (action.lower() == 'x'):
-				self.interact()
-			elif (action.lower() == 'i'):
-				self.player.show_inv()
-			elif (action.lower() == 'h'):
-				self.help()
-			elif (action == "use"):
-				self.player.use_potion()
+			try: # Catching ctrl+c
+				flush()
+				if (self.player.battle_history[(4,4)]==1): # if player completed the final fight
+					self.end_screen(1)
+					break
+				self.show_description()
+				if (self.player.battle): # if the player has entered battle
+					self.battle_engine(self.battle_pos[self.player.location])
+				if (self.player.die):
+					self.end_screen(0)
+					break
+				action = input('>')
+				if (action.lower() == 'n'):
+					self.player.update_pos(0,1)
+				elif (action.lower() == 's'):
+					self.player.update_pos(0,-1);
+				elif (action.lower() == 'e'):
+					self.player.update_pos(1,0);
+				elif (action.lower() == 'w'):
+					self.player.update_pos(-1,0)
+				elif (action.lower() == 'x'):
+					self.interact()
+				elif (action.lower() == 'i'):
+					self.player.show_inv()
+				elif (action.lower() == 'h'):
+					self.help()
+				elif (action == "use"):
+					self.player.use_potion()
+				elif (action != ''):
+					print("\nInvalid action!")
+			except KeyboardInterrupt:
+				sys.exit()
 
 if "__main__" == __name__:
-	game = Game()
-	game.loop()
-
+	while (running): # main loop
+		flush()
+		game = Game()
+		game.loop()
