@@ -61,6 +61,7 @@ class Player:
 		lst[1] += y
 		self.location = tuple(lst)
 		if (self.location not in self.game.game_map): # in the event that there is no room at that coordinate
+			print("\nInvalid option!")
 			self.location = orig
 		else:
 			self.prev = orig
@@ -98,4 +99,3 @@ class Player:
 				del self.inventory[option]
 		else:
 			print("What do you plan to do with your sword now...")
-		
