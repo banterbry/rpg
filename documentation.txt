@@ -1,0 +1,32 @@
+Introduction:
+This is a text based adventure game.
+It is set in a Labyrinth, where the player must escape by defeating the Minotaur located somewhere
+inside the maze. Along the way, the player will have to defeat other monsters in order to get to the
+Minotaur.
+The player would have to figure out the safest route by the descriptions of the different rooms in the game.
+
+Challenges:
+One major challenge I faced was during the implementation of the battle engine. I wanted to make a 
+battle engine where it could be used as a template in any fight, needing to only to input the stats of the monsters,
+which prevent as much hardcoding as possible. However, I did not plan out the logic flow of the engine, 
+which resulted in many bugs and a lot of troubleshooting, causing my code to be inefficient and cluttered. 
+
+How I overcame them:
+I managed to overcome this obstacle by rewriting chunks of the engine and also simplifying the combat
+system. 
+
+Things I learnt:
+1. It is crucial to plan out what I'm going to code, especially for complicated projects. 
+
+2. Having a "template" for different features can save a lot of time and energy. E.g. a dictionary to store
+the descriptions of different rooms instead of hardcoding every possible event
+
+3. Keeping my code organised and well commented allows me to code quicker and more efficiently, as I do not need to waste time searching for a specific function or wondering what a chunk of code does, especially after
+not touching the project for a period of time.
+
+Note:
+Please run "game.py", and include all the files in the same directory
+The testcases contain:
+1 optimal/speedrun done manually by me. 
+100 randomly generated runs of the game
+5 randomly generated game runs where the player ends up winning
